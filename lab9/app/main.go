@@ -11,6 +11,7 @@ import (
 	"fmt"
 )
 
+// Точка входа в приложение
 func main() {
 
 	cfg, err := config.LoadConfig()
@@ -42,6 +43,7 @@ func main() {
 	menu(handlers)
 }
 
+// Отображение основного меню приложение
 func menu(handlers []internal.Handler) {
 	var choice int
 

@@ -6,20 +6,24 @@ import (
 	"math"
 )
 
+// Обработчик для меню пользователей
 type SysUserHandler struct {
 	service *SysUserService
 }
 
+// Функция создания обработчика для меню пользователей
 func NewSysUserHandler(service *SysUserService) *SysUserHandler {
 	return &SysUserHandler{
 		service: service,
 	}
 }
 
+// Метод получения названия обработчика
 func (h *SysUserHandler) Name() string {
 	return "Системный пользователь"
 }
 
+// Метод отображения основого меню пользователя
 func (h *SysUserHandler) Menu() {
 	var choice int
 
@@ -57,6 +61,7 @@ func (h *SysUserHandler) Menu() {
 	}
 }
 
+// Метод отображения меню просмотра пользователей
 func (h *SysUserHandler) ShowMenu() {
 	choice := 0
 	page := 1
@@ -102,6 +107,7 @@ func (h *SysUserHandler) ShowMenu() {
 	}
 }
 
+// Метод отображения меню создания записи пользователя
 func (h *SysUserHandler) CreateMenu() {
 	var personID int
 	var password string
@@ -128,6 +134,7 @@ func (h *SysUserHandler) CreateMenu() {
 	}
 }
 
+// Метод отображения обновления данных о пользователе
 func (h *SysUserHandler) UpdateMenu() {
 	var id int
 	var password string
@@ -164,6 +171,7 @@ func (h *SysUserHandler) UpdateMenu() {
 	}
 }
 
+// Метод отображения меню удадения записи о пользователе
 func (h *SysUserHandler) DeleteMenu() {
 	var id int
 
@@ -193,6 +201,7 @@ func (h *SysUserHandler) DeleteMenu() {
 	}
 }
 
+// Метод отображения меню проверки пароля пользователя
 func (h *SysUserHandler) CheckPasswordMenu() {
 	var id int
 	var password string

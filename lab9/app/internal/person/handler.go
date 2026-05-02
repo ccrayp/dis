@@ -6,21 +6,25 @@ import (
 	"math"
 )
 
+// Обработчик для меню персон
 type PersonHandler struct {
 	service *PersonService
 	t       any
 }
 
+// Функция создания обработчика для меню персон
 func NewPersonHandler(service *PersonService) *PersonHandler {
 	return &PersonHandler{
 		service: service,
 	}
 }
 
+// Метод получения названия обработчика
 func (h *PersonHandler) Name() string {
 	return "Персона"
 }
 
+// Метод отображения основого меню персон
 func (h *PersonHandler) Menu() {
 	var choice int
 
@@ -55,6 +59,7 @@ func (h *PersonHandler) Menu() {
 	}
 }
 
+// Метод отображения меню просмотра персон
 func (h *PersonHandler) ShowMenu() {
 	choice := 0
 	page := 1
@@ -100,6 +105,7 @@ func (h *PersonHandler) ShowMenu() {
 	}
 }
 
+// Метод отображения меню создания записи персоны
 func (h *PersonHandler) CreateMenu() {
 	var name, phone string
 	var age int
@@ -128,6 +134,7 @@ func (h *PersonHandler) CreateMenu() {
 	}
 }
 
+// Метод отображения обновления данных о персоне
 func (h *PersonHandler) UpdateMenu() {
 	var id int
 
@@ -166,6 +173,7 @@ func (h *PersonHandler) UpdateMenu() {
 	}
 }
 
+// Метод отображения меню удадения записи о персоне
 func (h *PersonHandler) DeleteMenu() {
 	var id int
 

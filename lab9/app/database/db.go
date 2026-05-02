@@ -9,10 +9,12 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+// Класс подключения к базе данных
 type Database struct {
 	Connection *gorm.DB
 }
 
+// Функция подключения к базе данных
 func Connect(config config.Config) (*Database, error) {
 	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s TimeZone=Europe/Moscow",
 		config.PostgreSQL.User,

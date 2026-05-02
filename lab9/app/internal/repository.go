@@ -9,12 +9,14 @@ import (
 	"gorm.io/gorm"
 )
 
+// Класс шаблонный репозиторий
 type Repository[T any] struct {
 	db        *database.Database
 	logger    *logger.Logger
 	tableName string
 }
 
+// Функция создания экземпляра шаблонного репозитория
 func NewRepository[T any](tableName string, db *database.Database, logger *logger.Logger) *Repository[T] {
 	return &Repository[T]{
 		db:        db,
@@ -23,6 +25,7 @@ func NewRepository[T any](tableName string, db *database.Database, logger *logge
 	}
 }
 
+// Метод получения общего количества записей
 func (r *Repository[T]) GetAmountQuantity() (int, error) {
 	items, err := gorm.G[T](r.db.Connection).Find(context.Background())
 	if err != nil {
@@ -34,6 +37,7 @@ func (r *Repository[T]) GetAmountQuantity() (int, error) {
 	return len(items), nil
 }
 
+// Метод получения записей с лимитом и сдвигом (по страницам)
 func (r *Repository[T]) GetByLimitOffset(limit, offset int) ([]T, error) {
 	items, err := gorm.G[T](r.db.Connection).
 		Limit(limit).
@@ -49,6 +53,7 @@ func (r *Repository[T]) GetByLimitOffset(limit, offset int) ([]T, error) {
 	return items, nil
 }
 
+// Метод получения записи по идентификатору
 func (r *Repository[T]) GetById(id uint) (*T, error) {
 	item, err := gorm.G[T](r.db.Connection).
 		Where("id = ?", id).
@@ -62,6 +67,7 @@ func (r *Repository[T]) GetById(id uint) (*T, error) {
 	return &item, nil
 }
 
+// Метод создания записи
 func (r *Repository[T]) Create(item T) (uint, error) {
 	if err := gorm.G[T](r.db.Connection).Create(context.Background(), &item); err != nil {
 		r.logger.MakeLog("repository", "CREATE", r.tableName, err.Error(), logger.Error)
@@ -72,6 +78,7 @@ func (r *Repository[T]) Create(item T) (uint, error) {
 	return any(item).(interface{ GetId() uint }).GetId(), nil
 }
 
+// Метод обновления данных
 func (r *Repository[T]) Update(item *T) error {
 	_, err := gorm.G[T](r.db.Connection).
 		Where("id = ?", any(item).(interface{ GetId() uint }).GetId()).
@@ -85,6 +92,7 @@ func (r *Repository[T]) Update(item *T) error {
 	return err
 }
 
+// Метод удаления записи
 func (r *Repository[T]) Delete(id uint) error {
 	_, err := gorm.G[T](r.db.Connection).
 		Where("id = ?", id).

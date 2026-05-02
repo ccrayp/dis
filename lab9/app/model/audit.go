@@ -2,6 +2,7 @@ package model
 
 import "time"
 
+// Структура описывающая модель данных журанал
 type Audit struct {
 	Id          uint
 	Actor       string
@@ -12,6 +13,7 @@ type Audit struct {
 	Timestamp   time.Time
 }
 
+// Метод получения имени таблицы журанла
 func (Audit) TableName() string {
 	return "audit"
 }

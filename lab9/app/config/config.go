@@ -2,10 +2,12 @@ package config
 
 import "github.com/ilyakaznacheev/cleanenv"
 
+// Структура конфигурации приложение
 type Config struct {
 	PostgreSQL PostgreSQL `yaml:"db"`
 }
 
+// Структура конфиграции параметров для подключения к базе данных
 type PostgreSQL struct {
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
@@ -15,6 +17,7 @@ type PostgreSQL struct {
 	SslMode  string `yaml:"sslmode"`
 }
 
+// Функция загрузки конфигурации приложения
 func LoadConfig() (*Config, error) {
 	var config Config
 

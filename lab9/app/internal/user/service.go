@@ -9,11 +9,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Сервисный класс для сущности пользователя
 type SysUserService struct {
 	repository *internal.Repository[model.SysUser]
 	logger     *logger.Logger
 }
 
+// Функция для создания нового экземпларя сервиса пользователей
 func NewSysUserService(repository *internal.Repository[model.SysUser], logger *logger.Logger) *SysUserService {
 	return &SysUserService{
 		repository: repository,
@@ -21,18 +23,22 @@ func NewSysUserService(repository *internal.Repository[model.SysUser], logger *l
 	}
 }
 
+// Метод получения общего количества записей о пользователях
 func (s *SysUserService) GetAmountQuantity() (int, error) {
 	return s.repository.GetAmountQuantity()
 }
 
+// Метод получения записей о пользователях с лимитом и сдвигом (по страницам)
 func (s *SysUserService) GetByLimitOffset(limit, offset int) ([]model.SysUser, error) {
 	return s.repository.GetByLimitOffset(limit, offset)
 }
 
+// Метод получения записи по идентификатору пользователя
 func (s *SysUserService) GetById(id uint) (*model.SysUser, error) {
 	return s.repository.GetById(id)
 }
 
+// Метод созлания записи о пользователе
 func (s *SysUserService) Create(personID uint, password string) (uint, error) {
 	if personID == 0 {
 		s.logger.MakeLog("service", "CREATE", "user", "invalid person_id", logger.Warning)
@@ -54,6 +60,7 @@ func (s *SysUserService) Create(personID uint, password string) (uint, error) {
 	})
 }
 
+// Метод обновления данных о пользователе
 func (s *SysUserService) Update(user *model.SysUser, password string) error {
 	if user.PersonId == 0 {
 		s.logger.MakeLog("service", "UPDATE", "user", "invalid person_id", logger.Warning)
@@ -74,10 +81,12 @@ func (s *SysUserService) Update(user *model.SysUser, password string) error {
 	return s.repository.Update(user)
 }
 
+// Метод удаления записи о пользователе
 func (s *SysUserService) Delete(id uint) error {
 	return s.repository.Delete(id)
 }
 
+// Метод проверки пароля пользователя
 func (s *SysUserService) CheckPassword(id uint, password string) (bool, error) {
 	user, err := s.repository.GetById(id)
 	if err != nil {

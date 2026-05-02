@@ -8,11 +8,13 @@ import (
 	"regexp"
 )
 
+// Сервисный класс для сущности персона
 type PersonService struct {
 	repository *internal.Repository[model.Person]
 	logger     *logger.Logger
 }
 
+// Функция для создания нового экземпларя сервиса персон
 func NewPersonService(repository *internal.Repository[model.Person], logger *logger.Logger) *PersonService {
 	return &PersonService{
 		repository: repository,
@@ -20,6 +22,7 @@ func NewPersonService(repository *internal.Repository[model.Person], logger *log
 	}
 }
 
+// Метод получения общего количества записей о персонах
 func (s *PersonService) GetAmountQuantity() (int, error) {
 	quantity, err := s.repository.GetAmountQuantity()
 	if err != nil {
@@ -29,6 +32,7 @@ func (s *PersonService) GetAmountQuantity() (int, error) {
 	return quantity, nil
 }
 
+// Метод получения записей о персонах с лимитом и сдвигом (по страницам)
 func (s *PersonService) GetByLimitOffset(limit, offset int) ([]model.Person, error) {
 	persons, err := s.repository.GetByLimitOffset(limit, offset)
 	if err != nil {
@@ -38,6 +42,7 @@ func (s *PersonService) GetByLimitOffset(limit, offset int) ([]model.Person, err
 	return persons, nil
 }
 
+// Метод получения записи по идентификатору персоны
 func (s *PersonService) GetById(id uint) (*model.Person, error) {
 	person, err := s.repository.GetById(id)
 	if err != nil {
@@ -47,6 +52,7 @@ func (s *PersonService) GetById(id uint) (*model.Person, error) {
 	return person, nil
 }
 
+// Метод создания записи о персоне
 func (s *PersonService) Create(name, phone string, age int) (uint, error) {
 	re := regexp.MustCompile(`^(\+7|8)[0-9]{10}$`)
 
@@ -71,6 +77,7 @@ func (s *PersonService) Create(name, phone string, age int) (uint, error) {
 	return id, nil
 }
 
+// Метод обновления данных о персоне
 func (s *PersonService) Update(person *model.Person) error {
 	re := regexp.MustCompile(`^(\+7|8)[0-9]{10}$`)
 
@@ -90,6 +97,7 @@ func (s *PersonService) Update(person *model.Person) error {
 	return nil
 }
 
+// Метод удаления записи о персоне
 func (s *PersonService) Delete(id uint) error {
 	return s.repository.Delete(id)
 }
