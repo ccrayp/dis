@@ -1,0 +1,1039 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>config: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">app/config/config.go (100.0%)</option>
+				
+				<option value="file1">app/database/db.go (100.0%)</option>
+				
+				<option value="file2">app/internal/logger/logger.go (100.0%)</option>
+				
+				<option value="file3">app/internal/logger/repository.go (100.0%)</option>
+				
+				<option value="file4">app/internal/person/handler.go (0.0%)</option>
+				
+				<option value="file5">app/internal/person/service.go (100.0%)</option>
+				
+				<option value="file6">app/internal/repository.go (70.6%)</option>
+				
+				<option value="file7">app/internal/user/handler.go (0.0%)</option>
+				
+				<option value="file8">app/internal/user/service.go (94.7%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package config
+
+import "github.com/ilyakaznacheev/cleanenv"
+
+// Структура конфигурации приложение
+type Config struct {
+        PostgreSQL PostgreSQL `yaml:"db"`
+}
+
+// Структура конфиграции параметров для подключения к базе данных
+type PostgreSQL struct {
+        User     string `yaml:"user"`
+        Password string `yaml:"password"`
+        DBname   string `yaml:"dbname"`
+        Host     string `yaml:"host"`
+        Port     string `yaml:"port"`
+        SslMode  string `yaml:"sslmode"`
+}
+
+// Функция загрузки конфигурации приложения
+func LoadConfig(configPath string) (*Config, error) <span class="cov8" title="1">{
+        var config Config
+
+        if err := cleanenv.ReadConfig(configPath, &amp;config); err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return &amp;config, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package database
+
+import (
+        "app/config"
+        "fmt"
+
+        "gorm.io/driver/postgres"
+        "gorm.io/gorm"
+        "gorm.io/gorm/logger"
+)
+
+// Класс подключения к базе данных
+type Database struct {
+        Connection *gorm.DB
+}
+
+// Функция подключения к базе данных
+func Connect(config config.Config) (*Database, error) <span class="cov8" title="1">{
+        dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s TimeZone=Europe/Moscow",
+                config.PostgreSQL.User,
+                config.PostgreSQL.Password,
+                config.PostgreSQL.DBname,
+                config.PostgreSQL.Host,
+                config.PostgreSQL.Port,
+                config.PostgreSQL.SslMode,
+        )
+
+        db, err := gorm.Open(postgres.Open(dsn), &amp;gorm.Config{
+                Logger: logger.Default.LogMode(logger.Silent),
+        })
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return &amp;Database{
+                Connection: db,
+        }, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package logger
+
+import (
+        "app/model"
+        "time"
+)
+
+// Уровень записи в журнале
+type Level string
+
+// Перечисление уровней записи в журале
+const (
+        Info    Level = "info"
+        Warning Level = "warning"
+        Error   Level = "error"
+)
+
+// Класс логгер
+type Logger struct {
+        repository *AuditRepository
+}
+
+// Функция создания экземпляра логгера
+func NewLogger(repository *AuditRepository) *Logger <span class="cov8" title="1">{
+        return &amp;Logger{
+                repository: repository,
+        }
+}</span>
+
+// Метод записи события в журнал аудита
+func (l *Logger) MakeLog(actor, action, target, descirption string, level Level) error <span class="cov8" title="1">{
+        record := model.Audit{
+                Actor:       actor,
+                Action:      action,
+                Target:      target,
+                Level:       string(level),
+                Description: descirption,
+                Timestamp:   time.Now(),
+        }
+
+        return l.repository.CreateRecord(&amp;record)
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package logger
+
+import (
+        "app/database"
+        "app/model"
+        "context"
+
+        "gorm.io/gorm"
+)
+
+// Класс репозиторий для доступа к таблице audit в БД
+type AuditRepository struct {
+        db *database.Database
+}
+
+// Функция создания экземпляра репозитория журанла аудита
+func NewAuditRepository(db *database.Database) *AuditRepository <span class="cov8" title="1">{
+        return &amp;AuditRepository{
+                db: db,
+        }
+}</span>
+
+// Метод созадния записи в журнал
+func (r *AuditRepository) CreateRecord(record *model.Audit) error <span class="cov8" title="1">{
+        return gorm.G[model.Audit](r.db.Connection).Create(context.Background(), record)
+}</span>
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package person
+
+import (
+        "app/utils"
+        "fmt"
+        "math"
+)
+
+// Обработчик для меню персон
+type PersonHandler struct {
+        service *PersonService
+        t       any
+}
+
+// Функция создания обработчика для меню персон
+func NewPersonHandler(service *PersonService) *PersonHandler <span class="cov0" title="0">{
+        return &amp;PersonHandler{
+                service: service,
+        }
+}</span>
+
+// Метод получения названия обработчика
+func (h *PersonHandler) Name() string <span class="cov0" title="0">{
+        return "Персона"
+}</span>
+
+// Метод отображения основого меню персон
+func (h *PersonHandler) Menu() <span class="cov0" title="0">{
+        var choice int
+
+        for </span><span class="cov0" title="0">{
+                utils.Clean()
+                fmt.Print("МЕНЮ \"Персона\"\n\n")
+                fmt.Println("1. Просмотр по страницам")
+                fmt.Println("2. Добавить")
+                fmt.Println("3. Изменить")
+                fmt.Println("4. Удалить")
+                fmt.Println("5. Выход")
+                fmt.Print("&gt;&gt;&gt; ")
+
+                fmt.Scan(&amp;choice)
+
+                if choice &lt;= 0 || choice &gt; 5 </span><span class="cov0" title="0">{
+                        continue</span>
+                } else<span class="cov0" title="0"> if choice == 5 </span><span class="cov0" title="0">{
+                        break</span>
+                }
+
+                <span class="cov0" title="0">switch choice </span>{
+                case 1:<span class="cov0" title="0">
+                        h.ShowMenu()</span>
+                case 2:<span class="cov0" title="0">
+                        h.CreateMenu()</span>
+                case 3:<span class="cov0" title="0">
+                        h.UpdateMenu()</span>
+                case 4:<span class="cov0" title="0">
+                        h.DeleteMenu()</span>
+                }
+        }
+}
+
+// Метод отображения меню просмотра персон
+func (h *PersonHandler) ShowMenu() <span class="cov0" title="0">{
+        choice := 0
+        page := 1
+
+        for </span><span class="cov0" title="0">{
+                q, _ := h.service.GetAmountQuantity()
+                pages := int(math.Ceil(float64(q) / 10.0))
+
+                switch choice </span>{
+                case 1:<span class="cov0" title="0">
+                        if page &gt; 1 </span><span class="cov0" title="0">{
+                                page--
+                        }</span>
+                case 2:<span class="cov0" title="0">
+                        if page &lt; pages </span><span class="cov0" title="0">{
+                                page++
+                        }</span>
+                case 3:<span class="cov0" title="0">
+                        return</span>
+                }
+
+                <span class="cov0" title="0">utils.Clean()
+                fmt.Print("Просмотр персон\n\n")
+                fmt.Print("1. Предыдущая страница\n2. Следующая страница\n3. Выход\n\n")
+                fmt.Printf("Общее число персон: %d\n", q)
+                fmt.Printf("Страница %d из %d\n", page, pages)
+
+                persons, err := h.service.GetByLimitOffset(10, (page-1)*10)
+                if err != nil </span>{<span class="cov0" title="0">
+                }</span>
+
+                <span class="cov0" title="0">fmt.Println()
+                for _, person := range persons </span><span class="cov0" title="0">{
+                        fmt.Printf("%d. %s %d %s\n", person.Id, person.Name, person.Age, person.Phone)
+                }</span>
+
+                <span class="cov0" title="0">fmt.Print("\n&gt;&gt;&gt; ")
+                fmt.Scan(&amp;choice)
+
+                if choice &lt; 1 || choice &gt; 3 </span><span class="cov0" title="0">{
+                        choice = 0
+                }</span>
+        }
+}
+
+// Метод отображения меню создания записи персоны
+func (h *PersonHandler) CreateMenu() <span class="cov0" title="0">{
+        var name, phone string
+        var age int
+
+        for </span><span class="cov0" title="0">{
+                utils.Clean()
+
+                fmt.Print("Добавление перосны\n\n")
+                fmt.Print("Введите имя\n&gt;&gt;&gt; ")
+                fmt.Scanln(&amp;name)
+                fmt.Print("Введите возраст\n&gt;&gt;&gt; ")
+                fmt.Scan(&amp;age)
+                fmt.Print("Введите номер телефона (+7/80000000000)\n&gt;&gt;&gt; ")
+                fmt.Scan(&amp;phone)
+
+                id, err := h.service.Create(name, phone, age)
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Printf("\nОшибка создания записи: %s", err.Error())
+                        utils.Pause()
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">fmt.Printf("\nПерсона успешно добавлена, id новой записи: %d", id)
+                utils.Pause()
+                break</span>
+        }
+}
+
+// Метод отображения обновления данных о персоне
+func (h *PersonHandler) UpdateMenu() <span class="cov0" title="0">{
+        var id int
+
+        for </span><span class="cov0" title="0">{
+                utils.Clean()
+
+                fmt.Print("Обновление данных о персоне\n\n")
+                fmt.Print("Введите идентификатор персоны для поиска\n&gt;&gt;&gt; ")
+                fmt.Scan(&amp;id)
+
+                person, err := h.service.GetById(uint(id))
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Printf("\nОшибка поиска записи: %s", err.Error())
+                        utils.Pause()
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">fmt.Printf("\nВведите имя (%s)\n&gt;&gt;&gt; ", person.Name)
+                fmt.Scanln(&amp;person.Name)
+
+                fmt.Printf("Введите возраст (%d)\n&gt;&gt;&gt; ", person.Age)
+                fmt.Scan(&amp;person.Age)
+
+                fmt.Printf("Введите номер телефона (%s)\n&gt;&gt;&gt; ", person.Phone)
+                fmt.Scan(&amp;person.Phone)
+
+                if err := h.service.Update(person); err != nil </span><span class="cov0" title="0">{
+                        fmt.Printf("\nОшибка обновления записи: %s", err.Error())
+                        utils.Pause()
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">fmt.Printf("\nДанные персоны успешно обновлены")
+                utils.Pause()
+                return</span>
+        }
+}
+
+// Метод отображения меню удадения записи о персоне
+func (h *PersonHandler) DeleteMenu() <span class="cov0" title="0">{
+        var id int
+
+        for </span><span class="cov0" title="0">{
+                utils.Clean()
+
+                fmt.Print("Удаление записи о персоне\n\n")
+                fmt.Print("Введите идентификатор персоны для поиска\n&gt;&gt;&gt; ")
+                fmt.Scan(&amp;id)
+
+                person, err := h.service.GetById(uint(id))
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Printf("\nОшибка поиска записи: %s", err.Error())
+                        utils.Pause()
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">if err := h.service.Delete(person.Id); err != nil </span><span class="cov0" title="0">{
+                        fmt.Printf("\nОшибка удаления записи: %s", err.Error())
+                        utils.Pause()
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">fmt.Printf("\nЗапись успешно удалена")
+                utils.Pause()
+                return</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package person
+
+import (
+        "app/internal"
+        "app/internal/logger"
+        "app/model"
+        "fmt"
+        "regexp"
+)
+
+// Сервисный класс для сущности персона
+type PersonService struct {
+        repository internal.IRepository[model.Person]
+        logger     *logger.Logger
+}
+
+// Функция для создания нового экземпларя сервиса персон
+func NewPersonService(repository internal.IRepository[model.Person], logger *logger.Logger) *PersonService <span class="cov8" title="1">{
+        return &amp;PersonService{
+                repository: repository,
+                logger:     logger,
+        }
+}</span>
+
+// Метод получения общего количества записей о персонах
+func (s *PersonService) GetAmountQuantity() (int, error) <span class="cov8" title="1">{
+        quantity, err := s.repository.GetAmountQuantity()
+        if err != nil </span><span class="cov8" title="1">{
+                return 0, err
+        }</span>
+
+        <span class="cov8" title="1">return quantity, nil</span>
+}
+
+// Метод получения записей о персонах с лимитом и сдвигом (по страницам)
+func (s *PersonService) GetByLimitOffset(limit, offset int) ([]model.Person, error) <span class="cov8" title="1">{
+        persons, err := s.repository.GetByLimitOffset(limit, offset)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return persons, nil</span>
+}
+
+// Метод получения записи по идентификатору персоны
+func (s *PersonService) GetById(id uint) (*model.Person, error) <span class="cov8" title="1">{
+        person, err := s.repository.GetById(id)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return person, nil</span>
+}
+
+// Метод создания записи о персоне
+func (s *PersonService) Create(name, phone string, age int) (uint, error) <span class="cov8" title="1">{
+        re := regexp.MustCompile(`^(\+7|8)[0-9]{10}$`)
+
+        if !re.MatchString(phone) </span><span class="cov8" title="1">{
+                s.logger.MakeLog("service", "CREATE", "person", "invalid phone number", logger.Warning)
+                return 0, fmt.Errorf("Некорретный номер телефона")
+        }</span>
+        <span class="cov8" title="1">if age &lt;= 0 </span><span class="cov8" title="1">{
+                s.logger.MakeLog("service", "CREATE", "person", "invalid age", logger.Warning)
+                return 0, fmt.Errorf("Некорректный возраст")
+        }</span>
+
+        <span class="cov8" title="1">id, err := s.repository.Create(model.Person{
+                Name:  name,
+                Age:   uint(age),
+                Phone: phone,
+        })
+        if err != nil </span><span class="cov8" title="1">{
+                return 0, err
+        }</span>
+
+        <span class="cov8" title="1">return id, nil</span>
+}
+
+// Метод обновления данных о персоне
+func (s *PersonService) Update(person *model.Person) error <span class="cov8" title="1">{
+        re := regexp.MustCompile(`^(\+7|8)[0-9]{10}$`)
+
+        if !re.MatchString(person.Phone) </span><span class="cov8" title="1">{
+                s.logger.MakeLog("service", "UPDATE", "person", "invalid phone number", logger.Warning)
+                return fmt.Errorf("Некорректный номер телефона")
+        }</span>
+        <span class="cov8" title="1">if person.Age &lt;= 0 </span><span class="cov8" title="1">{
+                s.logger.MakeLog("service", "UPDATE", "person", "invalid age", logger.Warning)
+                return fmt.Errorf("Некорректный возраст")
+        }</span>
+
+        <span class="cov8" title="1">if err := s.repository.Update(person); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// Метод удаления записи о персоне
+func (s *PersonService) Delete(id uint) error <span class="cov8" title="1">{
+        if id &lt;= 0 </span><span class="cov8" title="1">{
+                return fmt.Errorf("Некорректрый идентификатор")
+        }</span>
+
+        <span class="cov8" title="1">err := s.repository.Delete(id)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package internal
+
+import (
+        "app/database"
+        "app/internal/logger"
+        "context"
+        "fmt"
+
+        "gorm.io/gorm"
+)
+
+// Класс шаблонный репозиторий
+type Repository[T any] struct {
+        db        *database.Database
+        logger    *logger.Logger
+        tableName string
+}
+
+// Функция создания экземпляра шаблонного репозитория
+func NewRepository[T any](tableName string, db *database.Database, logger *logger.Logger) IRepository[T] <span class="cov8" title="1">{
+        return &amp;Repository[T]{
+                db:        db,
+                logger:    logger,
+                tableName: tableName,
+        }
+}</span>
+
+// Метод получения общего количества записей
+func (r *Repository[T]) GetAmountQuantity() (int, error) <span class="cov8" title="1">{
+        items, err := gorm.G[T](r.db.Connection).Find(context.Background())
+        if err != nil </span><span class="cov0" title="0">{
+                r.logger.MakeLog("repository", "GET", r.tableName, err.Error(), logger.Error)
+                return 0, err
+        }</span>
+
+        <span class="cov8" title="1">r.logger.MakeLog("repository", "GET", r.tableName, "get amount quantity", logger.Info)
+        return len(items), nil</span>
+}
+
+// Метод получения записей с лимитом и сдвигом (по страницам)
+func (r *Repository[T]) GetByLimitOffset(limit, offset int) ([]T, error) <span class="cov8" title="1">{
+        items, err := gorm.G[T](r.db.Connection).
+                Limit(limit).
+                Offset(offset).
+                Order("id").
+                Find(context.Background())
+        if err != nil </span><span class="cov0" title="0">{
+                r.logger.MakeLog("repository", "GET", r.tableName, err.Error(), logger.Error)
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">r.logger.MakeLog("repository", "GET", r.tableName, "get by limit and offset", logger.Info)
+        return items, nil</span>
+}
+
+// Метод получения записи по идентификатору
+func (r *Repository[T]) GetById(id uint) (*T, error) <span class="cov8" title="1">{
+        item, err := gorm.G[T](r.db.Connection).
+                Where("id = ?", id).
+                First(context.Background())
+        if err != nil </span><span class="cov0" title="0">{
+                r.logger.MakeLog("repository", "GET", r.tableName, err.Error(), logger.Error)
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">r.logger.MakeLog("repository", "GET", r.tableName, "get by id", logger.Info)
+        return &amp;item, nil</span>
+}
+
+// Метод создания записи
+func (r *Repository[T]) Create(item T) (uint, error) <span class="cov8" title="1">{
+        if err := gorm.G[T](r.db.Connection).Create(context.Background(), &amp;item); err != nil </span><span class="cov0" title="0">{
+                r.logger.MakeLog("repository", "CREATE", r.tableName, err.Error(), logger.Error)
+                return 0, err
+        }</span>
+
+        <span class="cov8" title="1">r.logger.MakeLog("repository", "CREATE", r.tableName, fmt.Sprintf("create record. id: %d", any(item).(interface{ GetId() uint }).GetId()), logger.Info)
+        return any(item).(interface{ GetId() uint }).GetId(), nil</span>
+}
+
+// Метод обновления данных
+func (r *Repository[T]) Update(item *T) error <span class="cov8" title="1">{
+        _, err := gorm.G[T](r.db.Connection).
+                Where("id = ?", any(item).(interface{ GetId() uint }).GetId()).
+                Updates(context.Background(), *item)
+
+        if err != nil </span><span class="cov0" title="0">{
+                r.logger.MakeLog("repository", "UPDATE", r.tableName, fmt.Sprintf("id: %d. errod: %s", any(item).(interface{ GetId() uint }).GetId(), err.Error()), logger.Error)
+        }</span>
+
+        <span class="cov8" title="1">r.logger.MakeLog("repository", "UPDATE", r.tableName, fmt.Sprintf("update record. id: %d", any(item).(interface{ GetId() uint }).GetId()), logger.Info)
+        return err</span>
+}
+
+// Метод удаления записи
+func (r *Repository[T]) Delete(id uint) error <span class="cov8" title="1">{
+        _, err := gorm.G[T](r.db.Connection).
+                Where("id = ?", id).
+                Delete(context.Background())
+
+        if err != nil </span><span class="cov0" title="0">{
+                r.logger.MakeLog("repository", "DELETE", r.tableName, fmt.Sprintf("id: %d. error: %s", id, err.Error()), logger.Error)
+        }</span>
+
+        <span class="cov8" title="1">r.logger.MakeLog("repository", "DELETE", r.tableName, fmt.Sprintf("id: %d", id), logger.Info)
+        return err</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package user
+
+import (
+        "app/utils"
+        "fmt"
+        "math"
+)
+
+// Обработчик для меню пользователей
+type SysUserHandler struct {
+        service *SysUserService
+}
+
+// Функция создания обработчика для меню пользователей
+func NewSysUserHandler(service *SysUserService) *SysUserHandler <span class="cov0" title="0">{
+        return &amp;SysUserHandler{
+                service: service,
+        }
+}</span>
+
+// Метод получения названия обработчика
+func (h *SysUserHandler) Name() string <span class="cov0" title="0">{
+        return "Системный пользователь"
+}</span>
+
+// Метод отображения основого меню пользователя
+func (h *SysUserHandler) Menu() <span class="cov0" title="0">{
+        var choice int
+
+        for </span><span class="cov0" title="0">{
+                utils.Clean()
+                fmt.Print("МЕНЮ \"Системный пользователь\"\n\n")
+                fmt.Println("1. Просмотр по страницам")
+                fmt.Println("2. Добавить")
+                fmt.Println("3. Изменить")
+                fmt.Println("4. Удалить")
+                fmt.Println("5. Проверить пароль")
+                fmt.Println("6. Выход")
+                fmt.Print("&gt;&gt;&gt; ")
+
+                fmt.Scan(&amp;choice)
+
+                if choice &lt;= 0 || choice &gt; 6 </span><span class="cov0" title="0">{
+                        continue</span>
+                } else<span class="cov0" title="0"> if choice == 6 </span><span class="cov0" title="0">{
+                        break</span>
+                }
+
+                <span class="cov0" title="0">switch choice </span>{
+                case 1:<span class="cov0" title="0">
+                        h.ShowMenu()</span>
+                case 2:<span class="cov0" title="0">
+                        h.CreateMenu()</span>
+                case 3:<span class="cov0" title="0">
+                        h.UpdateMenu()</span>
+                case 4:<span class="cov0" title="0">
+                        h.DeleteMenu()</span>
+                case 5:<span class="cov0" title="0">
+                        h.CheckPasswordMenu()</span>
+                }
+        }
+}
+
+// Метод отображения меню просмотра пользователей
+func (h *SysUserHandler) ShowMenu() <span class="cov0" title="0">{
+        choice := 0
+        page := 1
+
+        for </span><span class="cov0" title="0">{
+                q, _ := h.service.GetAmountQuantity()
+                pages := int(math.Ceil(float64(q) / 10.0))
+
+                switch choice </span>{
+                case 1:<span class="cov0" title="0">
+                        if page &gt; 1 </span><span class="cov0" title="0">{
+                                page--
+                        }</span>
+                case 2:<span class="cov0" title="0">
+                        if page &lt; pages </span><span class="cov0" title="0">{
+                                page++
+                        }</span>
+                case 3:<span class="cov0" title="0">
+                        return</span>
+                }
+
+                <span class="cov0" title="0">utils.Clean()
+                fmt.Print("Просмотр системных пользователей\n\n")
+                fmt.Print("1. Предыдущая страница\n2. Следующая страница\n3. Выход\n\n")
+                fmt.Printf("Общее число пользователей: %d\n", q)
+                fmt.Printf("Страница %d из %d\n", page, pages)
+
+                users, err := h.service.GetByLimitOffset(10, (page-1)*10)
+                if err != nil </span>{<span class="cov0" title="0">
+                }</span>
+
+                <span class="cov0" title="0">fmt.Println()
+                for _, user := range users </span><span class="cov0" title="0">{
+                        fmt.Printf("%d. Идентификатор персоны=%d hash=%s\n", user.Id, user.PersonId, user.PasswordHash)
+                }</span>
+
+                <span class="cov0" title="0">fmt.Print("\n&gt;&gt;&gt; ")
+                fmt.Scan(&amp;choice)
+
+                if choice &lt; 1 || choice &gt; 3 </span><span class="cov0" title="0">{
+                        choice = 0
+                }</span>
+        }
+}
+
+// Метод отображения меню создания записи пользователя
+func (h *SysUserHandler) CreateMenu() <span class="cov0" title="0">{
+        var personID int
+        var password string
+
+        for </span><span class="cov0" title="0">{
+                utils.Clean()
+
+                fmt.Print("Добавление системного пользователя\n\n")
+                fmt.Print("Введите id персоны\n&gt;&gt;&gt; ")
+                fmt.Scan(&amp;personID)
+                fmt.Print("Введите пароль\n&gt;&gt;&gt; ")
+                fmt.Scan(&amp;password)
+
+                id, err := h.service.Create(uint(personID), password)
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Printf("\nОшибка создания записи: %s", err.Error())
+                        utils.Pause()
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">fmt.Printf("\nСистемный пользователь успешно добавлен, id новой записи: %d", id)
+                utils.Pause()
+                return</span>
+        }
+}
+
+// Метод отображения обновления данных о пользователе
+func (h *SysUserHandler) UpdateMenu() <span class="cov0" title="0">{
+        var id int
+        var password string
+
+        for </span><span class="cov0" title="0">{
+                utils.Clean()
+
+                fmt.Print("Обновление данных системного пользователя\n\n")
+                fmt.Print("Введите идентификатор пользователя для поиска\n&gt;&gt;&gt; ")
+                fmt.Scan(&amp;id)
+
+                user, err := h.service.GetById(uint(id))
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Printf("\nОшибка поиска записи: %s", err.Error())
+                        utils.Pause()
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">fmt.Printf("\nВведите id персоны (%d)\n&gt;&gt;&gt; ", user.PersonId)
+                fmt.Scan(&amp;user.PersonId)
+
+                fmt.Printf("Введите новый пароль\n&gt;&gt;&gt; ")
+                fmt.Scan(&amp;password)
+
+                if err := h.service.Update(user, password); err != nil </span><span class="cov0" title="0">{
+                        fmt.Printf("\nОшибка обновления записи: %s", err.Error())
+                        utils.Pause()
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">fmt.Printf("\nДанные системного пользователя успешно обновлены")
+                utils.Pause()
+                return</span>
+        }
+}
+
+// Метод отображения меню удадения записи о пользователе
+func (h *SysUserHandler) DeleteMenu() <span class="cov0" title="0">{
+        var id int
+
+        for </span><span class="cov0" title="0">{
+                utils.Clean()
+
+                fmt.Print("Удаление системного пользователя\n\n")
+                fmt.Print("Введите идентификатор пользователя для поиска\n&gt;&gt;&gt; ")
+                fmt.Scan(&amp;id)
+
+                user, err := h.service.GetById(uint(id))
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Printf("\nОшибка поиска записи: %s", err.Error())
+                        utils.Pause()
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">if err := h.service.Delete(user.Id); err != nil </span><span class="cov0" title="0">{
+                        fmt.Printf("\nОшибка удаления записи: %s", err.Error())
+                        utils.Pause()
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">fmt.Printf("\nЗапись успешно удалена")
+                utils.Pause()
+                return</span>
+        }
+}
+
+// Метод отображения меню проверки пароля пользователя
+func (h *SysUserHandler) CheckPasswordMenu() <span class="cov0" title="0">{
+        var id int
+        var password string
+
+        for </span><span class="cov0" title="0">{
+                utils.Clean()
+
+                fmt.Print("Проверка пароля системного пользователя\n\n")
+                fmt.Print("Введите идентификатор пользователя\n&gt;&gt;&gt; ")
+                fmt.Scan(&amp;id)
+
+                fmt.Print("Введите пароль\n&gt;&gt;&gt; ")
+                fmt.Scan(&amp;password)
+
+                ok, err := h.service.CheckPassword(uint(id), password)
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Printf("\nОшибка проверки пароля: %s", err.Error())
+                        utils.Pause()
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">if ok </span><span class="cov0" title="0">{
+                        fmt.Printf("\nПароль верный")
+                }</span> else<span class="cov0" title="0"> {
+                        fmt.Printf("\nПароль неверный")
+                }</span>
+
+                <span class="cov0" title="0">utils.Pause()
+                return</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package user
+
+import (
+        "app/internal"
+        "app/internal/logger"
+        "app/model"
+        "fmt"
+
+        "golang.org/x/crypto/bcrypt"
+)
+
+// Сервисный класс для сущности пользователя
+type SysUserService struct {
+        repository internal.IRepository[model.SysUser]
+        logger     *logger.Logger
+}
+
+// Функция для создания нового экземпларя сервиса пользователей
+func NewSysUserService(repository internal.IRepository[model.SysUser], logger *logger.Logger) *SysUserService <span class="cov8" title="1">{
+        return &amp;SysUserService{
+                repository: repository,
+                logger:     logger,
+        }
+}</span>
+
+// Метод получения общего количества записей о пользователях
+func (s *SysUserService) GetAmountQuantity() (int, error) <span class="cov8" title="1">{
+        return s.repository.GetAmountQuantity()
+}</span>
+
+// Метод получения записей о пользователях с лимитом и сдвигом (по страницам)
+func (s *SysUserService) GetByLimitOffset(limit, offset int) ([]model.SysUser, error) <span class="cov8" title="1">{
+        return s.repository.GetByLimitOffset(limit, offset)
+}</span>
+
+// Метод получения записи по идентификатору пользователя
+func (s *SysUserService) GetById(id uint) (*model.SysUser, error) <span class="cov8" title="1">{
+        return s.repository.GetById(id)
+}</span>
+
+// Метод созлания записи о пользователе
+func (s *SysUserService) Create(personID uint, password string) (uint, error) <span class="cov8" title="1">{
+        if personID == 0 </span><span class="cov8" title="1">{
+                s.logger.MakeLog("service", "CREATE", "user", "invalid person_id", logger.Warning)
+                return 0, fmt.Errorf("Некорректный id персоны")
+        }</span>
+        <span class="cov8" title="1">if len(password) &lt; 4 </span><span class="cov8" title="1">{
+                s.logger.MakeLog("service", "CREATE", "user", "password have to contain at least 4 chars", logger.Warning)
+                return 0, fmt.Errorf("Пароль должен содержать минимум 4 символа")
+        }</span>
+
+        <span class="cov8" title="1">hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+        if err != nil </span><span class="cov0" title="0">{
+                return 0, err
+        }</span>
+
+        <span class="cov8" title="1">return s.repository.Create(model.SysUser{
+                PersonId:     personID,
+                PasswordHash: string(hash),
+        })</span>
+}
+
+// Метод обновления данных о пользователе
+func (s *SysUserService) Update(user *model.SysUser, password string) error <span class="cov8" title="1">{
+        if user.PersonId == 0 </span><span class="cov8" title="1">{
+                s.logger.MakeLog("service", "UPDATE", "user", "invalid person_id", logger.Warning)
+                return fmt.Errorf("Некорректный id персоны")
+        }</span>
+        <span class="cov8" title="1">if len(password) &lt; 4 </span><span class="cov8" title="1">{
+                s.logger.MakeLog("service", "UPDATE", "user", "password have to contain at least 4 chars", logger.Warning)
+                return fmt.Errorf("Пароль должен содержать минимум 4 символа")
+        }</span>
+
+        <span class="cov8" title="1">hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">user.PasswordHash = string(hash)
+
+        return s.repository.Update(user)</span>
+}
+
+// Метод удаления записи о пользователе
+func (s *SysUserService) Delete(id uint) error <span class="cov8" title="1">{
+        if id &lt;= 0 </span><span class="cov8" title="1">{
+                return fmt.Errorf("Некорректрый идентификатор")
+        }</span>
+
+        <span class="cov8" title="1">err := s.repository.Delete(id)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// Метод проверки пароля пользователя
+func (s *SysUserService) CheckPassword(id uint, password string) (bool, error) <span class="cov8" title="1">{
+        user, err := s.repository.GetById(id)
+        if err != nil </span><span class="cov8" title="1">{
+                return false, err
+        }</span>
+
+        <span class="cov8" title="1">err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+        if err != nil </span><span class="cov8" title="1">{
+                s.logger.MakeLog("service", "CHECK_PASSWORD", "password", "passwords do not mathc", logger.Warning)
+        }</span>
+
+        <span class="cov8" title="1">return err == nil, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
