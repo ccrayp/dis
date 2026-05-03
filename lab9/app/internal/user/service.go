@@ -41,11 +41,11 @@ func (s *SysUserService) GetById(id uint) (*model.SysUser, error) {
 // Метод созлания записи о пользователе
 func (s *SysUserService) Create(personID uint, password string) (uint, error) {
 	if personID == 0 {
-		s.logger.MakeLog("service", "CREATE", "user", "invalid person_id", logger.Warning)
+		s.logger.MakeLog("service", "CREATE", "sys_user", "invalid person_id", logger.Warning)
 		return 0, fmt.Errorf("Некорректный id персоны")
 	}
 	if len(password) < 4 {
-		s.logger.MakeLog("service", "CREATE", "user", "password have to contain at least 4 chars", logger.Warning)
+		s.logger.MakeLog("service", "CREATE", "sys_user", "password have to contain at least 4 chars", logger.Warning)
 		return 0, fmt.Errorf("Пароль должен содержать минимум 4 символа")
 	}
 
@@ -63,11 +63,11 @@ func (s *SysUserService) Create(personID uint, password string) (uint, error) {
 // Метод обновления данных о пользователе
 func (s *SysUserService) Update(user *model.SysUser, password string) error {
 	if user.PersonId == 0 {
-		s.logger.MakeLog("service", "UPDATE", "user", "invalid person_id", logger.Warning)
+		s.logger.MakeLog("service", "UPDATE", "sys_user", "invalid person_id", logger.Warning)
 		return fmt.Errorf("Некорректный id персоны")
 	}
 	if len(password) < 4 {
-		s.logger.MakeLog("service", "UPDATE", "user", "password have to contain at least 4 chars", logger.Warning)
+		s.logger.MakeLog("service", "UPDATE", "sys_user", "password have to contain at least 4 chars", logger.Warning)
 		return fmt.Errorf("Пароль должен содержать минимум 4 символа")
 	}
 

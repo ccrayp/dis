@@ -9,7 +9,7 @@ type SysUser struct {
 
 // Метод получения имени таблицы пользователя
 func (SysUser) TableName() string {
-	return "user"
+	return "sys_user"
 }
 
 // Метод получения идентификатора пользователя
