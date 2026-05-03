@@ -17,7 +17,7 @@ type Repository[T any] struct {
 }
 
 // Функция создания экземпляра шаблонного репозитория
-func NewRepository[T any](tableName string, db *database.Database, logger *logger.Logger) *Repository[T] {
+func NewRepository[T any](tableName string, db *database.Database, logger *logger.Logger) IRepository[T] {
 	return &Repository[T]{
 		db:        db,
 		logger:    logger,
