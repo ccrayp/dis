@@ -17,18 +17,18 @@ const (
 
 // Класс логгер
 type Logger struct {
-	repository AuditRepository
+	repository *AuditRepository
 }
 
 // Функция создания экземпляра логгера
-func NewLogger(repository AuditRepository) *Logger {
+func NewLogger(repository *AuditRepository) *Logger {
 	return &Logger{
 		repository: repository,
 	}
 }
 
 // Метод записи события в журнал аудита
-func (l *Logger) MakeLog(actor, action, target, descirption string, level Level) {
+func (l *Logger) MakeLog(actor, action, target, descirption string, level Level) error {
 	record := model.Audit{
 		Actor:       actor,
 		Action:      action,
@@ -38,5 +38,5 @@ func (l *Logger) MakeLog(actor, action, target, descirption string, level Level)
 		Timestamp:   time.Now(),
 	}
 
-	l.repository.CreateRecord(&record)
+	return l.repository.CreateRecord(&record)
 }
