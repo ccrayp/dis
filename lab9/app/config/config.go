@@ -18,10 +18,10 @@ type PostgreSQL struct {
 }
 
 // Функция загрузки конфигурации приложения
-func LoadConfig() (*Config, error) {
+func LoadConfig(configPath string) (*Config, error) {
 	var config Config
 
-	if err := cleanenv.ReadConfig("config.yaml", &config); err != nil {
+	if err := cleanenv.ReadConfig(configPath, &config); err != nil {
 		return nil, err
 	}
 
