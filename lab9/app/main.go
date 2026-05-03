@@ -14,7 +14,7 @@ import (
 // Точка входа в приложение
 func main() {
 
-	cfg, err := config.LoadConfig()
+	cfg, err := config.LoadConfig("config.yaml")
 	if err != nil {
 		fmt.Printf("Error while loading configs: %s\n", err.Error())
 	}
@@ -25,7 +25,7 @@ func main() {
 	}
 
 	auditRepository := logger.NewAuditRepository(db)
-	logger := logger.NewLogger(*auditRepository)
+	logger := logger.NewLogger(auditRepository)
 
 	personRepository := internal.NewRepository[model.Person](model.Person{}.TableName(), db, logger)
 	personService := person.NewPersonService(personRepository, logger)
@@ -61,6 +61,8 @@ func menu(handlers []internal.Handler) {
 
 		if choice == len(handlers)+1 {
 			break
+		} else if choice > len(handlers) {
+			continue
 		}
 
 		handlers[choice-1].Menu()
