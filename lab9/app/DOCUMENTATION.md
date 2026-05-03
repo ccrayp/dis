@@ -19,7 +19,7 @@ import "app/config"
 ## Index
 
 - [type Config](<#Config>)
-  - [func LoadConfig\(\) \(\*Config, error\)](<#LoadConfig>)
+  - [func LoadConfig\(configPath string\) \(\*Config, error\)](<#LoadConfig>)
 - [type PostgreSQL](<#PostgreSQL>)
 
 
@@ -38,7 +38,7 @@ type Config struct {
 ### func LoadConfig
 
 ```go
-func LoadConfig() (*Config, error)
+func LoadConfig(configPath string) (*Config, error)
 ```
 
 Функция загрузки конфигурации приложения
@@ -322,7 +322,7 @@ import "app/utils"
 func Clean()
 ```
 
-
+Функция очистки экрана
 
 <a name="Pause"></a>
 ## func Pause
@@ -331,7 +331,7 @@ func Clean()
 func Pause()
 ```
 
-
+Функция приоставновки выполнения программы до нажатия любой кнопки
 
 # logger
 
@@ -346,8 +346,8 @@ import "app/internal/logger"
   - [func \(r \*AuditRepository\) CreateRecord\(record \*model.Audit\) error](<#AuditRepository.CreateRecord>)
 - [type Level](<#Level>)
 - [type Logger](<#Logger>)
-  - [func NewLogger\(repository AuditRepository\) \*Logger](<#NewLogger>)
-  - [func \(l \*Logger\) MakeLog\(actor, action, target, descirption string, level Level\)](<#Logger.MakeLog>)
+  - [func NewLogger\(repository \*AuditRepository\) \*Logger](<#NewLogger>)
+  - [func \(l \*Logger\) MakeLog\(actor, action, target, descirption string, level Level\) error](<#Logger.MakeLog>)
 
 
 <a name="AuditRepository"></a>
@@ -413,7 +413,7 @@ type Logger struct {
 ### func NewLogger
 
 ```go
-func NewLogger(repository AuditRepository) *Logger
+func NewLogger(repository *AuditRepository) *Logger
 ```
 
 Функция создания экземпляра логгера
@@ -422,7 +422,7 @@ func NewLogger(repository AuditRepository) *Logger
 ### func \(\*Logger\) MakeLog
 
 ```go
-func (l *Logger) MakeLog(actor, action, target, descirption string, level Level)
+func (l *Logger) MakeLog(actor, action, target, descirption string, level Level) error
 ```
 
 Метод записи события в журнал аудита
