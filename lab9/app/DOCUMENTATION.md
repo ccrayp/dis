@@ -100,8 +100,9 @@ import "app/internal"
 ## Index
 
 - [type Handler](<#Handler>)
+- [type IRepository](<#IRepository>)
+  - [func NewRepository\[T any\]\(tableName string, db \*database.Database, logger \*logger.Logger\) IRepository\[T\]](<#NewRepository>)
 - [type Repository](<#Repository>)
-  - [func NewRepository\[T any\]\(tableName string, db \*database.Database, logger \*logger.Logger\) \*Repository\[T\]](<#NewRepository>)
   - [func \(r \*Repository\[T\]\) Create\(item T\) \(uint, error\)](<#Repository[T].Create>)
   - [func \(r \*Repository\[T\]\) Delete\(id uint\) error](<#Repository[T].Delete>)
   - [func \(r \*Repository\[T\]\) GetAmountQuantity\(\) \(int, error\)](<#Repository[T].GetAmountQuantity>)
@@ -122,6 +123,31 @@ type Handler interface {
 }
 ```
 
+<a name="IRepository"></a>
+## type IRepository
+
+Интерфейс шаблонного репозитория
+
+```go
+type IRepository[T any] interface {
+    GetAmountQuantity() (int, error)
+    GetByLimitOffset(limit, offset int) ([]T, error)
+    GetById(id uint) (*T, error)
+    Create(item T) (uint, error)
+    Update(item *T) error
+    Delete(id uint) error
+}
+```
+
+<a name="NewRepository"></a>
+### func NewRepository
+
+```go
+func NewRepository[T any](tableName string, db *database.Database, logger *logger.Logger) IRepository[T]
+```
+
+Функция создания экземпляра шаблонного репозитория
+
 <a name="Repository"></a>
 ## type Repository
 
@@ -132,15 +158,6 @@ type Repository[T any] struct {
     // contains filtered or unexported fields
 }
 ```
-
-<a name="NewRepository"></a>
-### func NewRepository
-
-```go
-func NewRepository[T any](tableName string, db *database.Database, logger *logger.Logger) *Repository[T]
-```
-
-Функция создания экземпляра шаблонного репозитория
 
 <a name="Repository[T].Create"></a>
 ### func \(\*Repository\[T\]\) Create
@@ -444,7 +461,7 @@ import "app/internal/person"
   - [func \(h \*PersonHandler\) ShowMenu\(\)](<#PersonHandler.ShowMenu>)
   - [func \(h \*PersonHandler\) UpdateMenu\(\)](<#PersonHandler.UpdateMenu>)
 - [type PersonService](<#PersonService>)
-  - [func NewPersonService\(repository \*internal.Repository\[model.Person\], logger \*logger.Logger\) \*PersonService](<#NewPersonService>)
+  - [func NewPersonService\(repository internal.IRepository\[model.Person\], logger \*logger.Logger\) \*PersonService](<#NewPersonService>)
   - [func \(s \*PersonService\) Create\(name, phone string, age int\) \(uint, error\)](<#PersonService.Create>)
   - [func \(s \*PersonService\) Delete\(id uint\) error](<#PersonService.Delete>)
   - [func \(s \*PersonService\) GetAmountQuantity\(\) \(int, error\)](<#PersonService.GetAmountQuantity>)
@@ -542,7 +559,7 @@ type PersonService struct {
 ### func NewPersonService
 
 ```go
-func NewPersonService(repository *internal.Repository[model.Person], logger *logger.Logger) *PersonService
+func NewPersonService(repository internal.IRepository[model.Person], logger *logger.Logger) *PersonService
 ```
 
 Функция для создания нового экземпларя сервиса персон
@@ -619,7 +636,7 @@ import "app/internal/user"
   - [func \(h \*SysUserHandler\) ShowMenu\(\)](<#SysUserHandler.ShowMenu>)
   - [func \(h \*SysUserHandler\) UpdateMenu\(\)](<#SysUserHandler.UpdateMenu>)
 - [type SysUserService](<#SysUserService>)
-  - [func NewSysUserService\(repository \*internal.Repository\[model.SysUser\], logger \*logger.Logger\) \*SysUserService](<#NewSysUserService>)
+  - [func NewSysUserService\(repository internal.IRepository\[model.SysUser\], logger \*logger.Logger\) \*SysUserService](<#NewSysUserService>)
   - [func \(s \*SysUserService\) CheckPassword\(id uint, password string\) \(bool, error\)](<#SysUserService.CheckPassword>)
   - [func \(s \*SysUserService\) Create\(personID uint, password string\) \(uint, error\)](<#SysUserService.Create>)
   - [func \(s \*SysUserService\) Delete\(id uint\) error](<#SysUserService.Delete>)
@@ -727,7 +744,7 @@ type SysUserService struct {
 ### func NewSysUserService
 
 ```go
-func NewSysUserService(repository *internal.Repository[model.SysUser], logger *logger.Logger) *SysUserService
+func NewSysUserService(repository internal.IRepository[model.SysUser], logger *logger.Logger) *SysUserService
 ```
 
 Функция для создания нового экземпларя сервиса пользователей
