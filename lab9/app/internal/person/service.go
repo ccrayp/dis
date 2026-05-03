@@ -10,12 +10,12 @@ import (
 
 // Сервисный класс для сущности персона
 type PersonService struct {
-	repository *internal.Repository[model.Person]
+	repository internal.IRepository[model.Person]
 	logger     *logger.Logger
 }
 
 // Функция для создания нового экземпларя сервиса персон
-func NewPersonService(repository *internal.Repository[model.Person], logger *logger.Logger) *PersonService {
+func NewPersonService(repository internal.IRepository[model.Person], logger *logger.Logger) *PersonService {
 	return &PersonService{
 		repository: repository,
 		logger:     logger,
@@ -71,7 +71,7 @@ func (s *PersonService) Create(name, phone string, age int) (uint, error) {
 		Phone: phone,
 	})
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
 	return id, nil
@@ -99,5 +99,14 @@ func (s *PersonService) Update(person *model.Person) error {
 
 // Метод удаления записи о персоне
 func (s *PersonService) Delete(id uint) error {
-	return s.repository.Delete(id)
+	if id <= 0 {
+		return fmt.Errorf("Некорректрый идентификатор")
+	}
+
+	err := s.repository.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

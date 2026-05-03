@@ -11,12 +11,12 @@ import (
 
 // Сервисный класс для сущности пользователя
 type SysUserService struct {
-	repository *internal.Repository[model.SysUser]
+	repository internal.IRepository[model.SysUser]
 	logger     *logger.Logger
 }
 
 // Функция для создания нового экземпларя сервиса пользователей
-func NewSysUserService(repository *internal.Repository[model.SysUser], logger *logger.Logger) *SysUserService {
+func NewSysUserService(repository internal.IRepository[model.SysUser], logger *logger.Logger) *SysUserService {
 	return &SysUserService{
 		repository: repository,
 		logger:     logger,
@@ -83,7 +83,16 @@ func (s *SysUserService) Update(user *model.SysUser, password string) error {
 
 // Метод удаления записи о пользователе
 func (s *SysUserService) Delete(id uint) error {
-	return s.repository.Delete(id)
+	if id <= 0 {
+		return fmt.Errorf("Некорректрый идентификатор")
+	}
+
+	err := s.repository.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Метод проверки пароля пользователя
