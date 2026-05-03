@@ -13,6 +13,9 @@ run:
 	cd app && go run .
 	clear
 
+doc:
+	cd app && gomarkdoc -o DOCUMENTATION.md --exclude-dirs ./tests/... ./...
+
 test:
 	cd app && go test app/tests
 
