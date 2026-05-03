@@ -1,3 +1,5 @@
+.PHONY: coverage
+
 start_db:
 	docker compose up --build -d
 
@@ -10,3 +12,14 @@ drop_db: stop_db
 run:
 	cd app && go run .
 	clear
+
+test:
+	cd app && go test app/tests
+
+coverage:
+	mkdir -p coverage
+	cd app && go test \
+  		-coverpkg=./config,./database,./internal,./internal/logger,./internal/person,./internal/user \
+  		-coverprofile=../coverage/coverage.out \
+  		./tests
+	cd app && go tool cover -html=../coverage/coverage.out -o ../coverage/coverage.html
