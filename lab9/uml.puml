@@ -1,0 +1,210 @@
+@startuml
+top to bottom direction
+package app/config{
+annotation app/config {
+
+
++LoadConfig(configPath string): *Config, error
+}
+class Config {
++PostgreSQL: PostgreSQL
+
+}
+class PostgreSQL {
++User: string
++Password: string
++DBname: string
++Host: string
++Port: string
++SslMode: string
+
+}
+}
+package app/database{
+annotation app/database {
+
+
++Connect(config Config): *Database, error
+}
+class Database {
++Connection: *DB
+
+}
+}
+package app/internal/logger{
+annotation app/internal/logger {
+-const Info: Level
+-const Warning: Level
+-const Error: Level
+
++NewLogger(repository *AuditRepository): *Logger
++NewAuditRepository(db *Database): *AuditRepository
+}
+class Level {
+
+
+}
+class Logger {
+-repository: *AuditRepository
++MakeLog(actor string, action string, target string, descirption string, level Level): error
+}
+class AuditRepository {
+-db: *Database
++CreateRecord(record *Audit): error
+}
+}
+package app/internal/person{
+annotation app/internal/person {
+
+
++NewPersonHandler(service *PersonService): *PersonHandler
++NewPersonService(repository IRepository[Person], logger *Logger): *PersonService
+}
+class PersonHandler {
+-service: *PersonService
+-t: any
++Name(): string
++Menu()
++ShowMenu()
++CreateMenu()
++UpdateMenu()
++DeleteMenu()
+}
+class PersonService {
+-repository: IRepository[Person]
+-logger: *Logger
++GetAmountQuantity(): int, error
++GetByLimitOffset(limit int, offset int): []Person, error
++GetById(id uint): *Person, error
++Create(name string, phone string, age int): uint, error
++Update(person *Person): error
++Delete(id uint): error
+}
+}
+package app/internal/user{
+annotation app/internal/user {
+
+
++NewSysUserHandler(service *SysUserService): *SysUserHandler
++NewSysUserService(repository IRepository[SysUser], logger *Logger): *SysUserService
+}
+class SysUserHandler {
+-service: *SysUserService
++Name(): string
++Menu()
++ShowMenu()
++CreateMenu()
++UpdateMenu()
++DeleteMenu()
++CheckPasswordMenu()
+}
+class SysUserService {
+-repository: IRepository[SysUser]
+-logger: *Logger
++GetAmountQuantity(): int, error
++GetByLimitOffset(limit int, offset int): []SysUser, error
++GetById(id uint): *SysUser, error
++Create(personID uint, password string): uint, error
++Update(user *SysUser, password string): error
++Delete(id uint): error
++CheckPassword(id uint, password string): bool, error
+}
+}
+package app/internal{
+annotation app/internal {
+
+
++NewRepository(tableName string, db *Database, logger *Logger): IRepository[T]
+}
+interface Handler{
++Menu()
++Name(): string
+}
+interface IRepository[T]{
++GetAmountQuantity(): int, error
++GetByLimitOffset(limit int, offset int): []T, error
++GetById(id uint): *T, error
++Create(item T): uint, error
++Update(item *T): error
++Delete(id uint): error
+}
+class Repository[T] {
+-db: *Database
+-logger: *Logger
+-tableName: string
++GetAmountQuantity(): int, error
++GetByLimitOffset(limit int, offset int): []T, error
++GetById(id uint): *T, error
++Create(item T): uint, error
++Update(item *T): error
++Delete(id uint): error
+}
+}
+package app/model{
+class Audit {
++Id: uint
++Actor: string
++Action: string
++Target: string
++Level: string
++Description: string
++Timestamp: Time
++TableName(): string
+}
+class Person {
++Id: uint
++Name: string
++Age: uint
++Phone: string
++TableName(): string
++GetId(): uint
+}
+class SysUser {
++Id: uint
++PersonId: uint
++PasswordHash: string
++TableName(): string
++GetId(): uint
+}
+}
+package app/tests{
+class ErrorRepository[T] {
+
++GetAmountQuantity(): int, error
++GetByLimitOffset(limit int, offset int): []T, error
++GetById(id uint): *T, error
++Create(item T): uint, error
++Update(item *T): error
++Delete(id uint): error
+}
+}
+package app/utils{
+annotation app/utils {
+
+
++Pause()
++Clean()
+}
+}
+package ./app{
+annotation ./app {
+
+
+-main()
+-menu(handlers []Handler)
+}
+}
+"Config" --> "PostgreSQL"
+"AuditRepository" --> "Database"
+"Repository[T]" --> "Database"
+"Logger" --> "AuditRepository"
+"PersonService" --> "Logger"
+"SysUserService" --> "Logger"
+"Repository[T]" --> "Logger"
+"PersonHandler" --> "PersonService"
+"SysUserHandler" --> "SysUserService"
+"PersonHandler" --|> "Handler"
+"SysUserHandler" --|> "Handler"
+"Repository[T]" --|> "IRepository[T]"
+"ErrorRepository[T]" --|> "IRepository[T]"
+@enduml
