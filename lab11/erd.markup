@@ -1,0 +1,66 @@
+
+requests {
+	user_id int > user.user_id
+	context jsonb
+	timestamp timestamp
+	request_id int pk
+}
+
+services {
+	service_id int pk
+	service_name text
+}
+
+users {
+	host_id int > hosts.host_id
+	user_id int pk
+	user_name varchar(100)
+	uid int
+	gid int
+}
+
+hosts {
+	host_id integer pk
+	ip varchar(15)
+}
+
+rules {
+	rule_id int pk
+	rule_name varchar(100)
+	condition json
+	effect bool
+}
+
+decisions {
+	timestamp timestamp
+	decision_id int pk
+	request_id int > requests.request_id
+	policy_id int > policies.policy_id
+	result bool
+}
+
+policies {
+	policy_id int pk
+	policy_name varchar(10)
+	user_id int > users.user_id
+	status bool
+}
+
+policy_contents {
+	policy_id int > policies.policy_id
+	service_id int > services.service_id
+	rule_id int > rules.rule_id
+}
+
+refresh_tokens {
+	id int pk
+	token text
+	username text
+	created_at timestamp
+}
+
+sys_users {
+	id int pk
+	username text
+	password_hash char(60)
+}

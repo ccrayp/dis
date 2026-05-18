@@ -1,0 +1,49 @@
+@startuml
+title Топология заполнения базы данных
+
+top to bottom direction
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+' ===== Справочники =====
+package "1-я очередь\n(справочники)" {
+    rectangle hosts
+    rectangle services
+    rectangle rules
+    rectangle sys_users
+    rectangle refresh_tokens
+}
+
+' ===== Основные сущности =====
+package "2-я очередь\n(основные сущности)" {
+    rectangle users
+    rectangle policies
+}
+
+' ===== Связующая таблица =====
+package "3-я очередь\n(связи)" {
+    rectangle policy_contents
+}
+
+' ===== Аудит =====
+package "4-я очередь\n(аудит)" {
+    rectangle requests
+    rectangle decisions
+}
+
+' ===== Зависимости =====
+hosts --> users
+users --> policies
+
+services --> policy_contents
+rules --> policy_contents
+policies --> policy_contents
+
+users --> requests
+requests --> decisions
+policies --> decisions
+
+' ===== Независимые служебные таблицы =====
+sys_users ..> refresh_tokens : username
+
+@enduml
