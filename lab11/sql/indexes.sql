@@ -18,8 +18,7 @@ CREATE INDEX idx_decisions_timestamp ON decisions(timestamp);
 
 -- 3. Индекс по статусу политик (ускоряет поиск активных/неактивных политик)
 
-CREATE INDEX idx_policies_status
-    ON policies(status);
+CREATE INDEX idx_policies_status ON policies(status);
 
 -- 4. Индексы для нечеткого поиска (поиск по части слова и similarity())
 
