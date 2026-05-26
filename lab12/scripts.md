@@ -9,32 +9,32 @@ db.auth("mikhaylo_ra", "g%e&j5&%#o%")
 ```plaintext
 db.users (
 	"_id": ObjectId("..."),
-	"username": <>,
-	"uid": <>,
-	"gid": <>,
+	"username": "Имя пользователя",
+	"uid": больше 1000,
+	"gid": больше 1000,
 	"host": {
-        "ip": <>,
+        "ip": "xxx.xxx.xxx.xxx" -> "x.x.x.x",
     },
-    "email": <>
+    "email": "sometext@domain"
 );
 
 db.policies {
     "_id": ObjectId("..."),
-    "policy_name": <>,
+    "policy_name": "Название политиик",
     "user_id": ObjectId("<>"),
-    "status": <>,
+    "status": true/false,
 
     "services": [
 		{
-			"service_name": <>,
+			"service_name": "Название сервиса",
 			"rule": {
-				"rule_name": <>,
+				"rule_name": "Название правила",
                 "conditions": [
 					{
-						<>
+						Объект элемента условия
 					}
 				],
-                "effect": <>
+                "effect": true/false
             }
         }
 	]
@@ -44,30 +44,30 @@ db.policies {
 db.requests {
 	"_id": ObjectId("..."),
 	"user": {
-		"username": <>,
+		"username": "Имя пользователя",
 		"host": {
-			"ip": <>
+			"ip": "xxx.xxx.xxx.xxx" -> "x.x.x.x"
 		}
 	},
 	"context": {
-		<>
+		JSON
 	},
-	"timestamp": <>
+	"timestamp": ISODate("...")
 }
 
 db.decisions {
 	"_id": ObjectId("..."),
 	"request": {
-		"request_id": <>,
-		"service"
+		"request_id": ObjectId("<>"),
+		"service": "Имя севриса"
 	},
 	"policy": {
-		"policy_name": <>,
-		"status": <>
+		"policy_name": "Название политики",
+		"status": true/fase
 	},
 	"decision": {
-		"result": <>,
-		"rule_name": <>
+		"result": ALLOW/DENY,
+		"rule_name": "Название правила"
 	},
 	"timestamp": ISODate(<>)
 }
