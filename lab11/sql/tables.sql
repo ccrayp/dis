@@ -24,7 +24,7 @@ CREATE TABLE users (
 	user_id SERIAL PRIMARY KEY,
 	user_name VARCHAR(100) NOT NULL UNIQUE, 
 	uid INT NOT NULL,
-	gid INT
+	gid INT,
 	host_id INT NOT NULL REFERENCES hosts(host_id) ON DELETE CASCADE
 );
 
@@ -65,7 +65,7 @@ CREATE TABLE decisions (
 	decision_id SERIAL PRIMARY KEY,
 	request_id INT NOT NULL REFERENCES requests(request_id) ON DELETE CASCADE,
 	policy_id INT REFERENCES policies(policy_id) ON DELETE CASCADE,
-	result BOOLEAN NOT NULL
+	result BOOLEAN NOT NULL,
 	timestamp TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

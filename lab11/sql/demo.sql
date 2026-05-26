@@ -32,7 +32,14 @@ INSERT INTO users (user_name, uid, gid, host_id) VALUES
 ('rodion.bespalov', 1069, 1069, 19), ('alla.shilova', 1070, 1070, 20), ('timur.subbotin', 1071, 1071, 21),
 ('oksana.mironova', 1072, 1072, 22), ('fedot.rybakov', 1073, 1073, 23), ('inga.panova', 1074, 1074, 24),
 ('svyatoslav.kozlov', 1075, 1075, 25), ('rada.petukhova', 1076, 1076, 1), ('lavr.ermolaev', 1077, 1077, 2),
-('maya.tishchenko', 1078, 1078, 3), ('kuzma.kuzmin', 1079, 1079, 4), ('ada.samoylenko', 1080, 1080, 5);
+('maya.tishchenko', 1078, 1078, 3), ('kuzma.kuzmin', 1079, 1079, 4), ('ada.samoylenko', 1080, 1080, 5),
+('roman.timofeev', 1081, 1081, 1), ('oksana.grigorieva', 1082, 1082, 11), ('egor.sharapov', 1083, 1083, 2),
+('lidia.efremova', 1084, 1084, 2), ('anton.rogozin', 1085, 1085, 2), ('marina.larina', 1086, 1086, 2),
+('kirill.samsonov', 1087, 1087, 2), ('inna.ustinova', 1088, 1088, 2), ('vadim.tkachenko', 1089, 1089, 2),
+('polina.kalinina', 1090, 1090, 2), ('ilya.nesterov', 1091, 1091, 2), ('vera.guseva', 1092, 1092, 3),
+('danil.panov', 1093, 1093, 3), ('sofia.ryabova', 1094, 1094, 4), ('yuri.kolpakov', 1095, 1095, 4),
+('diana.martynova', 1096, 1096, 5), ('arseniy.dyakov', 1097, 1097, 3), ('svetlana.fokina', 1098, 1098, 1),
+('nikita.belozerov', 1099, 1099, 10), ('evgenia.tolstaya', 1100, 1100, 17);
 
 INSERT INTO sys_users (username, password_hash) VALUES
 ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'), -- password: password

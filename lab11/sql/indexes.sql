@@ -1,7 +1,7 @@
 -- Расширение для нечеткого поиска по строковым полям
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
---1. Индексы на внешние ключи (ускоряют JOIN и каскадные операции)
+-- 1. Индексы на внешние ключи (ускоряют JOIN и каскадные операции)
 
 CREATE INDEX idx_users_host_id ON users(host_id);
 CREATE INDEX idx_policies_user_id ON policies(user_id);
